@@ -1,6 +1,8 @@
 from flask import Flask
 from flask_simplelogin import SimpleLogin
 from flask import render_template
+from flask import request
+from flask import send_from_directory
 import sqlite3
 app = Flask(__name__)
 SimpleLogin(app)
@@ -9,12 +11,16 @@ SimpleLogin(app)
 def hello_world():
     return render_template('index.html')
 
-@app.route('/reg')
+@app.route('/reg', methods=['GET', 'POST'])
 def registration():
-    conn = sqlite3.connect("db/sqlite.db")
-    cursor = conn.cursor()
-    cursor.execute("""INSERT INTO users VALUES (NULL, 'test3', 'pass', 'http://hghghg')""")
-    conn.commit()
+    if request.method == 'POST':
+        return "ds"
+    else:
+        return send_from_directory(app.static_folder, "templates/registration.html")
+    # conn = sqlite3.connect("db/sqlite.db")
+    # cursor = conn.cursor()
+    # cursor.execute("""INSERT INTO users VALUES (NULL, 'test3', 'pass', 'http://hghghg')""")
+    # conn.commit()
     return "ok"
 
 # def main():
