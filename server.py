@@ -1,14 +1,34 @@
-from flask import Flask
+import functools
 from db import get_db
 from flask import (
-    render_template, flash, request, Blueprint, redirect, url_for )
+    render_template, flash, g, request, Blueprint, redirect, url_for, session )
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_simplelogin import SimpleLogin
 bp = Blueprint('server', __name__,)
-# app = Flask(__name__)
-# SimpleLogin(app)
+
+def login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            return redirect(url_for('server.login'))
+
+        return view(**kwargs)
+
+    return wrapped_view
+
+@bp.before_app_request
+def load_logged_in_user():
+    user_id = session.get('user_id')
+
+    if user_id is None:
+        g.user = None
+    else:
+        g.user = get_db().execute(
+            'SELECT * FROM user WHERE id = ?', (user_id,)
+        ).fetchone()
 
 @bp.route('/')
+#@login_required
 def index():
     return render_template('index.html')
 
@@ -38,18 +58,45 @@ def register():
                 (username, generate_password_hash(password), repository)
             )
             db.commit()
-            return redirect(url_for('simplelogin.login'))
+            return redirect(url_for('server.login'))
 
         flash(error)
 
     return render_template("auth/register.html")
 
 
-def login_checker(user):
-    """:param user: dict {'username': 'foo', 'password': 'bar'}"""
-    if user.get('username') == 'chuck' and user.get('password') == 'norris':
-       return True  # <--- Allowed
-    return False  # <--- Denied
+@bp.route('/log', methods=('GET', 'POST'))
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        db = get_db()
+        error = None
+        user = db.execute(
+            'SELECT * FROM user WHERE username = ?', (username,)
+        ).fetchone()
+
+        if user is None:
+            error = 'Incorrect username.'
+        elif not check_password_hash(user['password'], password):
+            error = 'Incorrect password.'
+
+        if error is None:
+            session.clear()
+            session['user_id'] = user['id']
+            return redirect(url_for('server.index'))
+
+        flash(error)
+
+    return render_template('auth/login.html')
 
 
-SimpleLogin(bp, login_checker=login_checker)
+@bp.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('server.index'))
+
+@bp.route('/lectures')
+@login_required
+def lectures():
+    return render_template('other/lectures.html')
