@@ -1,9 +1,8 @@
 import functools
-from db import get_db
+from flask_app.db import get_db
 from flask import (
     render_template, flash, g, request, Blueprint, redirect, url_for, session )
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_simplelogin import SimpleLogin
 bp = Blueprint('server', __name__,)
 
 def login_required(view):
@@ -84,7 +83,7 @@ def login():
         if error is None:
             session.clear()
             session['user_id'] = user['id']
-            return redirect(url_for('server.index'))
+            return redirect(url_for('server.login'))
 
         flash(error)
 
@@ -96,7 +95,16 @@ def logout():
     session.clear()
     return redirect(url_for('server.index'))
 
-@bp.route('/lectures')
+@bp.route('/lectures', methods=('GET', 'POST'))
 @login_required
 def lectures():
-    return render_template('other/lectures.html')
+    db = get_db()
+    if request.method == 'POST':
+        lecture_id = request.form['lecture']
+        db.execute('INSERT INTO t2u (task, user) VALUES (?, ?)',(lecture_id, g.user["id"]))
+        db.commit()
+        return redirect(url_for('server.lectures'))
+    else:
+        lectures = db.execute('SELECT t.id, t.name, t.description, t2u.id ready FROM task t LEFT JOIN t2u ON t2u.task = t.id GROUP BY t.id').fetchall()
+        return render_template('other/lectures.html', lectures=lectures)
+

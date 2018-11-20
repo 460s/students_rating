@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Lectures{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        {% for l in lectures %}
+            <div class="radio">
+                {% if l.ready %}
+                    <label>{{l.name}}</label> Готово
+                {% else %}
+                    <label><input type="radio" name="lecture" value="{{l.id}}" checked>{{l.name}}</label>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <input type="submit" value="Готово">
+    </form>
+{% endblock %}
