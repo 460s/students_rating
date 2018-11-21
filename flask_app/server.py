@@ -105,6 +105,11 @@ def lectures():
         db.commit()
         return redirect(url_for('server.lectures'))
     else:
-        lectures = db.execute('SELECT t.id, t.name, t.description, t2u.id ready FROM task t LEFT JOIN t2u ON t2u.task = t.id GROUP BY t.id').fetchall()
+        lectures = db.execute(
+            'SELECT t.id, t.name, t.description, t2u.user '
+            'FROM task t '
+            'LEFT JOIN t2u ON t2u.task = t.id AND t2u.user = ? '
+            'GROUP BY t.id', (g.user["id"],)
+                              ).fetchall()
         return render_template('other/lectures.html', lectures=lectures)
 

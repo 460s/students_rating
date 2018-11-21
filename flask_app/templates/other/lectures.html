@@ -8,7 +8,7 @@
     <form method="post">
         {% for l in lectures %}
             <div class="radio">
-                {% if l.ready %}
+                {% if l.user %}
                     <label>{{l.name}}</label> Готово
                 {% else %}
                     <label><input type="radio" name="lecture" value="{{l.id}}" checked>{{l.name}}</label>
