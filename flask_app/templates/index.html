@@ -14,21 +14,23 @@
     </tr>
   </thead>
   <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Чак Норрис</td>
-      <td>99999</td>
+  {% for s in students %}
+    {% if g.user.username == s.username %}
+        <tr style="font-weight: bold">
+    {% else %}
+        <tr>
+    {% endif %}
+        <th scope="row">
+        {% if loop.index > 5 %}
+            Вы
+        {% else %}
+          {{loop.index}}
+        {% endif %}
+        </th>
+        <td>{{s.username}}</td>
+        <td>{{s.grade}}</td>
     </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Tester</td>
-      <td>10</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td>Querida</td>
-      <td>5</td>
-    </tr>
+  {% endfor %}
   </tbody>
 </table>
 {% endblock %}

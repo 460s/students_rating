@@ -1,9 +1,12 @@
 import functools
-from flask_app.db import get_db
-from flask import (
-    render_template, flash, g, request, Blueprint, redirect, url_for, session )
+
+from flask import (Blueprint, flash, g, redirect, render_template, request, session, url_for)
 from werkzeug.security import check_password_hash, generate_password_hash
-bp = Blueprint('server', __name__,)
+
+from flask_app.db import get_db
+
+bp = Blueprint('server', __name__, )
+
 
 def login_required(view):
     @functools.wraps(view)
@@ -14,6 +17,7 @@ def login_required(view):
         return view(**kwargs)
 
     return wrapped_view
+
 
 @bp.before_app_request
 def load_logged_in_user():
@@ -26,10 +30,22 @@ def load_logged_in_user():
             'SELECT * FROM user WHERE id = ?', (user_id,)
         ).fetchone()
 
+
 @bp.route('/')
-#@login_required
+# @login_required
 def index():
-    return render_template('index.html')
+    db = get_db()
+    students = db.execute(
+        'SELECT u.username, IFNULL(SUM(t2u.grade), 0) grade '
+        'FROM user u '
+        'LEFT JOIN  t2u ON u.id = t2u.user '
+        'GROUP BY u.username '
+        'ORDER BY grade DESC LIMIT 5').fetchall()
+    students = [s for i, s in enumerate(students) if
+                g.user is not None and s["username"] == g.user["username"] or i < 6 and s["grade"] != 0]
+
+    return render_template('index.html', students=students)
+
 
 @bp.route('/reg', methods=['GET', 'POST'])
 def register():
@@ -45,7 +61,7 @@ def register():
         elif not password:
             error = 'Password is required.'
         elif not repository:
-            error = 'Password is required.'
+            error = 'Repository is required.'
         elif db.execute(
                 'SELECT id FROM user WHERE username = ?', (username,)
         ).fetchone() is not None:
@@ -95,13 +111,14 @@ def logout():
     session.clear()
     return redirect(url_for('server.index'))
 
+
 @bp.route('/lectures', methods=('GET', 'POST'))
 @login_required
 def lectures():
     db = get_db()
     if request.method == 'POST':
         lecture_id = request.form['lecture']
-        db.execute('INSERT INTO t2u (task, user) VALUES (?, ?)',(lecture_id, g.user["id"]))
+        db.execute('INSERT INTO t2u (task, user) VALUES (?, ?)', (lecture_id, g.user["id"]))
         db.commit()
         return redirect(url_for('server.lectures'))
     else:
@@ -110,6 +127,5 @@ def lectures():
             'FROM task t '
             'LEFT JOIN t2u ON t2u.task = t.id AND t2u.user = ? '
             'GROUP BY t.id', (g.user["id"],)
-                              ).fetchall()
+        ).fetchall()
         return render_template('other/lectures.html', lectures=lectures)
-
