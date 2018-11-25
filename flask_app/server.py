@@ -1,4 +1,5 @@
 import functools
+import os
 
 from flask import (Blueprint, flash, g, redirect, render_template, request, session, url_for)
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -34,17 +35,18 @@ def load_logged_in_user():
 @bp.route('/')
 # @login_required
 def index():
+    limit = int(os.environ.get('RATING_LIST_MAX_ELEMENTS', 5))
     db = get_db()
     students = db.execute(
         'SELECT u.username, IFNULL(SUM(t2u.grade), 0) grade '
         'FROM user u '
         'LEFT JOIN  t2u ON u.id = t2u.user '
         'GROUP BY u.username '
-        'ORDER BY grade DESC LIMIT 5').fetchall()
+        'ORDER BY grade DESC, SUM(t2u.id)').fetchall()
     students = [s for i, s in enumerate(students) if
-                g.user is not None and s["username"] == g.user["username"] or i < 6 and s["grade"] != 0]
+                g.user is not None and s["username"] == g.user["username"] or i < limit and s["grade"] != 0]
 
-    return render_template('index.html', students=students)
+    return render_template('index.html', students=students, limit=limit)
 
 
 @bp.route('/reg', methods=['GET', 'POST'])

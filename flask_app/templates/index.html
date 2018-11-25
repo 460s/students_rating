@@ -21,7 +21,7 @@
         <tr>
     {% endif %}
         <th scope="row">
-        {% if loop.index > 5 %}
+        {% if loop.index > limit %}
             Вы
         {% else %}
           {{loop.index}}
