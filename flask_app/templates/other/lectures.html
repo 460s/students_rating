@@ -9,7 +9,7 @@
         {% for l in lectures %}
             <div class="radio">
                 {% if l.user %}
-                    <label>{{l.name}}</label> Готово
+                    <label>{{l.name}}</label> Готово - {% if l.grade %} {{l.grade}} баллов{% else %}на проверке{% endif %}
                 {% else %}
                     <label><input type="radio" name="lecture" value="{{l.id}}" checked>{{l.name}}</label>
                 {% endif %}

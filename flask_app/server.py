@@ -125,7 +125,7 @@ def lectures():
         return redirect(url_for('server.lectures'))
     else:
         lectures = db.execute(
-            'SELECT t.id, t.name, t.description, t2u.user '
+            'SELECT t.id, t.name, t.description, t2u.user, t2u.grade '
             'FROM task t '
             'LEFT JOIN t2u ON t2u.task = t.id AND t2u.user = ? '
             'GROUP BY t.id', (g.user["id"],)
