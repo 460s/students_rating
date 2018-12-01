@@ -30,6 +30,13 @@ def init_db():
         db.executescript(f.read().decode('utf8'))
 
 
+def update_db():
+    db = get_db()
+
+    with current_app.open_resource('update_schema.sql') as f:
+        db.executescript(f.read().decode('utf8'))
+
+
 @click.command('init-db')
 @with_appcontext
 def init_db_command():
@@ -37,6 +44,14 @@ def init_db_command():
     click.echo('Initialized the database.')
 
 
+@click.command('update-db')
+@with_appcontext
+def update_db_command():
+    update_db()
+    click.echo('Updated the database.')
+
+
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
+    app.cli.add_command(update_db_command)

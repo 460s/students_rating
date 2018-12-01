@@ -6,15 +6,21 @@
 
 {% block content %}
     <form method="post">
+        {% set ns = namespace(has_incompleted_tasks=false) %}
         {% for l in lectures %}
             <div class="radio">
                 {% if l.user %}
                     <label>{{l.name}}</label> Готово - {% if l.grade %} {{l.grade}} баллов{% else %}на проверке{% endif %}
+                {% elif not l.available %}
+                    <label>{{l.name}}</label> Доступно для сдачи с <script>document.write(datetime_format(new Date({{l.pass_from * 1000}})));</script> по <script>document.write(datetime_format(new Date({{l.pass_to * 1000}})));</script>.
                 {% else %}
                     <label><input type="radio" name="lecture" value="{{l.id}}" checked>{{l.name}}</label>
+                    {% set ns.has_incompleted_tasks = true %}
                 {% endif %}
             </div>
         {% endfor %}
-        <input type="submit" value="Готово">
+        {% if ns.has_incompleted_tasks == true %}
+            <input type="submit" value="Готово">
+        {% endif %}
     </form>
 {% endblock %}
