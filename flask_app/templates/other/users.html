@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Users{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<form method="post">
+    <div class="panel panel-default">
+        <div class="panel-heading">Список пользователей</div>
+        <table class="table" name="user">
+            <tr>
+                <th style="width: 25px;">#</th>
+                <th>username</th>
+                <th>repository</th>
+                <th>admin</th>
+            </tr>
+        {% for u in users %}
+            <tr>
+                <td>{{u.id}}</td>
+                <td>{{u.username}}</td>
+                <td>{{u.repository}}</td>
+                <td><input type="checkbox" name="admin" value="{{u.id}}" {% if u.admin %} checked {% endif %}/></td>
+            </tr>
+        {% endfor %}
+        </table>
+    </div>
+    <input type="submit" value="Сохранить">
+</form>
+{% endblock %}

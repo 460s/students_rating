@@ -20,6 +20,17 @@ def login_required(view):
     return wrapped_view
 
 
+def admin_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None or g.user['admin'] != 1:
+            return redirect(url_for('server.login'))
+
+        return view(**kwargs)
+
+    return wrapped_view
+
+
 @bp.before_app_request
 def load_logged_in_user():
     user_id = session.get('user_id')
@@ -28,7 +39,7 @@ def load_logged_in_user():
         g.user = None
     else:
         g.user = get_db().execute(
-            'SELECT * FROM user WHERE id = ?', (user_id,)
+            'SELECT *, IFNULL(is_admin, 0) AS admin FROM user WHERE id = ?', (user_id,)
         ).fetchone()
 
 
@@ -41,6 +52,7 @@ def index():
         'SELECT u.username, IFNULL(SUM(t2u.grade), 0) grade '
         'FROM user u '
         'LEFT JOIN  t2u ON u.id = t2u.user '
+        'WHERE IFNULL(u.is_admin, 0) = 0 '
         'GROUP BY u.username '
         'ORDER BY grade DESC, SUM(t2u.id)').fetchall()
     students = [s for i, s in enumerate(students) if

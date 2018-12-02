@@ -5,9 +5,7 @@ from flask_app.db import get_db
 bp = Blueprint('lectures', __name__, )
 
 
-@bp.route('/lectures', methods=('GET', 'POST'))
-@login_required
-def lectures():
+def user_lectures():
     db = get_db()
     if request.method == 'POST':
         if 'lecture' in request.form:
@@ -25,3 +23,16 @@ def lectures():
             'GROUP BY t.id', (g.user["id"],)
         ).fetchall()
         return render_template('other/lectures.html', lectures=lectures_list)
+
+
+def admin_lestures():
+    return redirect(url_for('user.userlist'))
+
+
+@bp.route('/lectures', methods=('GET', 'POST'))
+@login_required
+def lectures():
+    if g.user["admin"] == 1:
+        return admin_lestures()
+    else:
+        return user_lectures()

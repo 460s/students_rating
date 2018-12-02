@@ -5,32 +5,35 @@
 {% endblock %}
 
 {% block content %}
-<table class="table">
-  <thead>
-    <tr>
-      <th>#</th>
-      <th>Name</th>
-      <th>Grade</th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for s in students %}
-    {% if g.user.username == s.username %}
-        <tr style="font-weight: bold">
-    {% else %}
+<div class="panel panel-default">
+    <div class="panel-heading">Текущий рейтинг</div>
+    <table class="table">
+      <thead>
         <tr>
-    {% endif %}
-        <th scope="row">
-        {% if loop.index > limit %}
-            Вы
+          <th style="width: 25px;">#</th>
+          <th>Name</th>
+          <th>Grade</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for s in students %}
+        {% if g.user.username == s.username %}
+            <tr style="font-weight: bold">
         {% else %}
-          {{loop.index}}
+            <tr>
         {% endif %}
-        </th>
-        <td>{{s.username}}</td>
-        <td>{{s.grade}}</td>
-    </tr>
-  {% endfor %}
-  </tbody>
-</table>
+            <th scope="row">
+            {% if loop.index > limit %}
+                Вы
+            {% else %}
+              {{loop.index}}
+            {% endif %}
+            </th>
+            <td>{{s.username}}</td>
+            <td>{{s.grade}}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+</div>
 {% endblock %}

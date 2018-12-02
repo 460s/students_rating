@@ -32,9 +32,17 @@ def init_db():
 
 def update_db():
     db = get_db()
+    try:
+        with current_app.open_resource('update_schema.sql') as f:
+            db.executescript(f.read().decode('utf8'))
+    except:
+        pass
+    try:
+        with current_app.open_resource('update_schema.2.sql') as f:
+            db.executescript(f.read().decode('utf8'))
+    except:
+        pass
 
-    with current_app.open_resource('update_schema.sql') as f:
-        db.executescript(f.read().decode('utf8'))
 
 
 @click.command('init-db')

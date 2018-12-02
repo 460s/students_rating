@@ -6,7 +6,8 @@ CREATE TABLE user (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   username TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL,
-  repository TEXT NOT NULL
+  repository TEXT NOT NULL,
+  is_admin INTEGER
 );
 
 create table t2u
