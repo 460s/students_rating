@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}Users{% endblock %}</h1>
+{% endblock %}
+{% block content %}
+<script type="text/javascript" src="https://nosir.github.io/cleave.js/dist/cleave.min.js"></script>
+<script>
+    window.onload=function(){
+        {% for t in tasks %}
+        var cleaveNumeral = new Cleave('.grade-input-{{t.id}}', {
+            numeral: true,
+        });
+        {% endfor %}
+    }
+</script>
+<form method="post">
+    <div class="panel panel-default">
+        <div class="panel-heading">Оценки задач пользователя <b>{{user.username}}</b></div>
+        <table class="table" name="user">
+            <tr>
+                <th style="width: 25px;">#</th>
+                <th>task</th>
+                <th>grade</th>
+            </tr>
+        {% for t in tasks %}
+            <tr>
+                <td>{{t.id}}</td>
+                <td>{{t.name}}</td>
+                <td><input id="task_grade" placeholder="99" name="{{t.id}}" maxlength="2" class="form-control item grade-input-{{t.id}}" value="{% if t.grade %}{{t.grade}}{% endif%}" type="text" pattern="[0-9]{0,2}"/></td>
+            </tr>
+        {% endfor %}
+        </table>
+    </div>
+    <input type="submit" value="Сохранить">
+</form>
+{% endblock %}

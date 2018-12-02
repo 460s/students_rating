@@ -27,3 +27,46 @@ def userlist():
             'FROM user u'
         ).fetchall()
         return render_template('other/users.html', users=users_list)
+
+
+@bp.route('/user/tasks', methods=('GET', 'POST'))
+@admin_required
+def usertasks():
+    if g.user["admin"] != 1:
+        raise Exception('admin access required')
+
+    db = get_db()
+    if request.method == 'POST':
+        form = request.form.to_dict(flat=True)
+        print(form)
+        for taskid in form:
+            grade = form[taskid]
+            if not grade:
+                continue
+            task2user = db.execute(
+                'SELECT * '
+                'FROM t2u '
+                'WHERE task = ? AND user = ?', (taskid, request.args.get('userid')),
+            ).fetchone()
+            if task2user:
+                db.execute('UPDATE t2u SET grade = ? WHERE task = ? AND user = ?', (grade, taskid, request.args.get('userid')))
+            else:
+                db.execute('INSERT INTO t2u (task, user, grade) VALUES (?, ?, ?)', (taskid, request.args.get('userid'), grade))
+            db.commit()
+
+        return redirect(url_for('user.usertasks') + '?userid=' + request.args.get('userid'))
+    else:
+        task_list = db.execute(
+            'SELECT t.id, t.name, t2u.grade, t2u.user '
+            'FROM user u '
+            'LEFT JOIN task t '
+            'LEFT JOIN t2u ON t2u.task = t.id AND t2u.user = u.id '
+            'WHERE u.id = ? '
+            'GROUP BY t.id', (request.args.get('userid'),)
+        ).fetchall()
+        user = db.execute(
+            'SELECT * '
+            'FROM user '
+            'WHERE id = ?', (request.args.get('userid')),
+        ).fetchone()
+        return render_template('other/usertasks.html', tasks=task_list, user=user)
