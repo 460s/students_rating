@@ -23,7 +23,7 @@ create table t2u
     references users (user)
       on update cascade
       on delete cascade,
-  grade INTEGER,
+  grade REAL,
   task  INTEGER,
   user  INTEGER
 );
