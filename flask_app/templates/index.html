@@ -23,7 +23,7 @@
             <tr>
         {% endif %}
             <th scope="row">
-            {% if loop.index > limit %}
+            {% if not g.user.is_admin and loop.index > limit %}
                 Вы
             {% else %}
               {{loop.index}}

@@ -23,7 +23,7 @@ def login_required(view):
 def admin_required(view):
     @functools.wraps(view)
     def wrapped_view(**kwargs):
-        if g.user is None or g.user['admin'] != 1:
+        if g.user is None or not g.user['admin']:
             return redirect(url_for('server.login'))
 
         return view(**kwargs)
@@ -55,8 +55,9 @@ def index():
         'WHERE IFNULL(u.is_admin, 0) = 0 '
         'GROUP BY u.username '
         'ORDER BY grade DESC, SUM(t2u.id)').fetchall()
-    students = [s for i, s in enumerate(students) if
-                g.user is not None and s["username"] == g.user["username"] or i < limit and s["grade"] != 0]
+    if g.user is None or not g.user['admin']:
+        students = [s for i, s in enumerate(students) if
+                    g.user is not None and s["username"] == g.user["username"] or i < limit and s["grade"] != 0]
 
     return render_template('index.html', students=students, limit=limit)
 
