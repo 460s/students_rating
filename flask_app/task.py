@@ -30,6 +30,6 @@ def tasklist():
             'LEFT JOIN task t '
             'JOIN t2u ON t2u.task = t.id AND t2u.user = u.id '
             'WHERE IFNULL(t2u.grade, 0) = 0 '
-            'GROUP BY t.id'
+            'GROUP BY t2u.id'
         ).fetchall()
         return render_template('other/tasklist.html', tasks=task_list)
