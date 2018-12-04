@@ -44,7 +44,7 @@ def usertasks():
             task2user = db.execute(
                 'SELECT * '
                 'FROM t2u '
-                'WHERE task = ? AND user = ?', (taskid, request.args.get('userid')),
+                'WHERE task = ? AND user = ?', (taskid, request.args.get('userid'))
             ).fetchone()
             if task2user:
                 db.execute('UPDATE t2u SET grade = ? WHERE task = ? AND user = ?', (grade, taskid, request.args.get('userid')))
@@ -62,11 +62,11 @@ def usertasks():
             'LEFT JOIN task t '
             'LEFT JOIN t2u ON t2u.task = t.id AND t2u.user = u.id '
             'WHERE u.id = ? '
-            'GROUP BY t.id', userid,
+            'GROUP BY t.id', (userid,)
         ).fetchall()
         user = db.execute(
             'SELECT * '
             'FROM user '
-            'WHERE id = ?', userid,
+            'WHERE id = ?', (userid,)
         ).fetchone()
         return render_template('other/usertasks.html', tasks=task_list, user=user)
