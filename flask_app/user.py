@@ -60,7 +60,7 @@ def usertasks():
             'LEFT JOIN task t '
             'LEFT JOIN t2u ON t2u.task = t.id AND t2u.user = u.id '
             'WHERE u.id = ? '
-            'GROUP BY t.id', (request.args.get('userid'),)
+            'GROUP BY t.id', (request.args.get('userid')),
         ).fetchall()
         user = db.execute(
             'SELECT * '
