@@ -2,7 +2,7 @@ import os
 import json
 from flask import Flask
 from flask_bootstrap import Bootstrap
-from flask_app import db, server, lectures, user
+from flask_app import db, server, lectures, user, task
 
 
 def get_config(path):
@@ -29,5 +29,6 @@ def create_app():
     app.register_blueprint(server.bp)
     app.register_blueprint(lectures.bp)
     app.register_blueprint(user.bp)
+    app.register_blueprint(task.bp)
     app.add_url_rule('/', endpoint='index')
     return app

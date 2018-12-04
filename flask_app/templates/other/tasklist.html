@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Users{% endblock %}</h1>
+  <h1>{% block title %}Tasks to rate{% endblock %}</h1>
 {% endblock %}
 {% block content %}
 <script type="text/javascript" src="https://nosir.github.io/cleave.js/dist/cleave.min.js"></script>
@@ -18,16 +18,20 @@
 </script>
 <form method="post">
     <div class="panel panel-default">
-        <div class="panel-heading">Оценки задач пользователя <b>{{user.username}}</b></div>
+        <div class="panel-heading">Оценка сданных задач</b></div>
         <table class="table" name="user">
             <tr>
                 <th style="width: 25px;">#</th>
+                <th>user</th>
+                <th>repository</th>
                 <th>task</th>
                 <th>grade</th>
             </tr>
         {% for t in tasks %}
             <tr>
                 <td>{{t.id}}</td>
+                <td>{{t.username}}</td>
+                <td>{{t.repository}}</td>
                 <td>{{t.name}}</td>
                 <td><input id="task_grade" placeholder="99.99" name="{{t.id}}" maxlength="5" class="form-control item grade-input-{{t.id}}" value="{% if t.grade %}{{t.grade}}{% endif%}" type="text"/></td>
             </tr>

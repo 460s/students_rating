@@ -40,7 +40,7 @@ def usertasks():
         form = request.form.to_dict(flat=True)
         print(form)
         for taskid in form:
-            grade = form[taskid]    
+            grade = form[taskid]
             task2user = db.execute(
                 'SELECT * '
                 'FROM t2u '
