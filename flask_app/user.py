@@ -54,17 +54,19 @@ def usertasks():
 
         return redirect(url_for('user.usertasks') + '?userid=' + request.args.get('userid'))
     else:
+        userid = request.args.get('userid')
+        print(userid)
         task_list = db.execute(
             'SELECT t.id, t.name, t2u.grade, t2u.user '
             'FROM user u '
             'LEFT JOIN task t '
             'LEFT JOIN t2u ON t2u.task = t.id AND t2u.user = u.id '
             'WHERE u.id = ? '
-            'GROUP BY t.id', (request.args.get('userid')),
+            'GROUP BY t.id', userid,
         ).fetchall()
         user = db.execute(
             'SELECT * '
             'FROM user '
-            'WHERE id = ?', (request.args.get('userid')),
+            'WHERE id = ?', userid,
         ).fetchone()
         return render_template('other/usertasks.html', tasks=task_list, user=user)
