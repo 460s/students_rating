@@ -49,7 +49,7 @@ def index():
     limit = int(os.environ.get('RATING_LIST_MAX_ELEMENTS', 5))
     db = get_db()
     students = db.execute(
-        'SELECT u.username, IFNULL(LENGTH(t2u.grade), 0) grade '
+        'SELECT u.username, IFNULL(SUM(t2u.grade), 0) grade '
         'FROM user u '
         'LEFT JOIN  t2u ON u.id = t2u.user '
         'WHERE IFNULL(u.is_admin, 0) = 0 '
